@@ -3,7 +3,7 @@ require 'discordrb'
 
 # Keep name lowercase for matching purposes
 surfCmdPrefix = ';'
-surfName = 'lagoon'
+surfName = 'Lagoon'
 
 maxDiscordMsgChars = 2000
 
@@ -19,7 +19,7 @@ fortuneResponses = [
 		"Yes.",
 		"Yes! Yes!",
 		"Indubitably.",
-		"#{surfName.capitalize} thinks so.",
+		"#{surfName} thinks so.",
 		"Yes, if it makes pony stop asking.",
 		"The rocks agree, and so it shall be!",
 		"My gems point towards yes!",
@@ -37,6 +37,30 @@ fortuneResponses = [
 	]
 ]
 
+cards = [
+	[
+		"Two",
+		"Three",
+		"Four",
+		"Five",
+		"Six",
+		"Seven",
+		"Eight",
+		"Nine",
+		"Ten",
+		"Jack",
+		"Queen",
+		"King",
+		"Ace"
+	],
+	[
+		"Clubs",
+		"Diamonds",
+		"Hearts",
+		"Spades"
+	]
+]
+
 randomResponses = [
 	"Try `%s`.",
 	"How about `%s`?",
@@ -44,7 +68,7 @@ randomResponses = [
 	"Pony should `%s`.",
 	"I think `%s` would make pony happy.",
 	"My gems point towards `%s`.",
-	"Uhh... #{surfName.capitalize} doesn't know. `%s`?",
+	"Uhh... #{surfName} doesn't know. `%s`?",
 	"I had a dream where gems surrounded `%s`.",
 	"`%s` sounds good."
 ]
@@ -69,6 +93,37 @@ end
 #Read in all files from within the plugins folder.
 
 #require_relative './plugins/randomItem.rb'
+
+bot.command(:draw, description: "Draw a card.") do |event, *args|
+	#bot.send_message("185914979050848256","Arg: " + args[0].to_s)
+	if !args[0].to_s.strip.nil? && args[0] =~ /[0-9]/
+		num = Integer(args[0])
+		if num <= 10 
+			numCards = num
+		elsif num > 10
+			event.respond "Too many cards! Try less than ten."
+			break
+		end
+	else
+		numCards = 1
+	end
+	cardString = ""
+	numCards.times do
+		roll = rand(1..54)
+		case roll
+		when 1..52
+			card = cards[0].sample + " of " + cards[1].sample
+		when 53
+			card = "Joker (with tm)"
+		when 54
+			card = "Joker (without TM)"
+		end 
+		cardString += card + "\n"
+	end
+	cardString.strip!
+	cardString = "\n" + cardString if numCards > 1
+	event.respond "You drew: " + cardString
+end
 
 def regularRoll(max)
 	return rand(1..max)
@@ -200,18 +255,20 @@ bot.command(:wroll, description: 'Rolls dice, but with a specific weighting algo
 	event.respond rollDice(event.message.to_s.split, true)
 end
 
-
+def pickRandomOption(listString)
+	options = listString.gsub(/or/, ',').gsub(/,\s*,+/,',').gsub(/\?/,'')
+	choice = options.split(',').sample
+	puts options
+	return choice.strip
+end
 
 # Random - picks at random from a list of provided strings.
 bot.command(:random, min_args: 1, description: 'Picks an item from a provided list.', usage: surfCmdPrefix + 'random item1[, item2, item3...]') do |event|
 	break if event.user.current_bot?
 
 	msg = event.message.content
-	options = msg.slice((surfCmdPrefix.length+7)..-1).split(',')
-	choice = options.sample
-	choice.strip! unless choice.nil?
-	event.respond randomResponses.sample % [choice]
-	#event.split(',').sample
+	options = msg.slice((surfCmdPrefix.length+7)..-1)
+	event.respond randomResponses.sample % [pickRandomOption(options)]
 end
 
 # Quit command
@@ -229,13 +286,16 @@ end
 bot.command(:embedtest, help_available: false) do |event|
 	break unless event.user.id == $sea_client_id
 
-	embed = Discordrb::Webhooks::Embed.new
-	embed.initialize
-	embed.add_field('',"test", true)
+	embed = Discordrb::Webhooks::Embed.new(
+		author: { name: "Sea" }
+	)
+	#embed.initialize
+	embed.add_field(name: '',value: "test",inline: true)
 	#embedText = Discordrb::Webhooks::EmbedField.new
 	#embedText.initialize(nil,"test",true)
 	#embed << embedText
-	bot.send_message(event.channel.id, "", false, embed)
+	#bot.send_message(event.channel.id, "", false, embed)
+	event.channel.send_embed('', embed)
 end
 
 # Generic commands
@@ -265,7 +325,7 @@ bot.command(:treat, help_available: false) do |event|
 	event.respond "[happy munching doggo noises]"
 end
 bot.command(:newspaper, help_available: false) do |event|
-	event.respond ["Pony knows not what they do.", "Do not!", "_:newspaper2:s @ u_"].sample
+	event.respond ["Pony knows not what they do.", "Do not!", "_:newspaper2: @ u_"].sample
 end
 bot.command(:spritz, help_available: false) do |event|
 	event.respond "[unhappy doggo noises]"
@@ -287,9 +347,13 @@ end
 
 # Fortune command
 bot.message do |event|
-	msg = event.message.to_s.downcase.chomp
-	respondWithFortune = (msg =~ /(#{surfName},.*\?)|(#{surfName}\?$)/)
-	if respondWithFortune 
+	msg = event.message.to_s.chomp
+	respondWithFortune = (msg =~ /(#{surfName},.*\?)|(#{surfName}\?$)/i)
+	respondWithRandom = (msg =~ /#{surfName},.*or.*\?/i)
+	if respondWithRandom
+		options = msg.slice((surfName.length+1)..-1)
+		event.respond randomResponses.sample % [pickRandomOption(options)]
+	elsif respondWithFortune 
 		event.respond fortuneResponses.sample.sample
 	end
 end
@@ -298,7 +362,7 @@ bot.message(with_text: 'Ping!') do |event|
 	event.respond 'Pong!'
 end
 
-bot.message(with_text: "Sleep well, #{surfName.capitalize}.") do |event|
+bot.message(with_text: "Sleep well, #{surfName}") do |event|
 	break unless event.user.id == $sea_client_id 
 	event.respond "You too, pony."
 	bot.stop
