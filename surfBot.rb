@@ -1,4 +1,5 @@
 require './surfBotInfo.rb'
+require './data/dotmInfo.rb'
 require 'discordrb'
 
 # Keep name lowercase for matching purposes
@@ -96,13 +97,37 @@ end
 
 bot.command(:draw, description: "Draw a card.") do |event, *args|
 	#bot.send_message("185914979050848256","Arg: " + args[0].to_s)
-	if !args[0].to_s.strip.nil? && args[0] =~ /[0-9]/
-		num = Integer(args[0])
-		if num <= 10 
+	domtOne = false
+	domtTwo = false
+
+	domtOne = true if args[0] =~ /domt/i
+	domtTwo = true if args[1] =~ /domt/i
+	if domtOne && domtTwo
+		event.respond "Don't put DoMT twice, silly."
+	elsif domtOne
+		numCardsString = args[1]
+	elsif domtTwo
+		numCardsString = args[0]
+	else
+		numCardsString = args[0]
+	end
+	
+	if !numCardsString.to_s.strip.nil? && numCardsString =~ /[0-9]/
+		num = Integer(numCardsString)
+		if num > 0 && num <= 10 
 			numCards = num
 		elsif num > 10
 			event.respond "Too many cards! Try less than ten."
 			break
+		elsif num <= 0
+			event.respond "Too few cards; you need at least one."
+			break
+		end
+		if num > 4
+			if domtOne || domtTwo
+				event.respond "Too many DoMT cards! I can't display all that text."
+				break
+			end
 		end
 	else
 		numCards = 1
@@ -114,14 +139,23 @@ bot.command(:draw, description: "Draw a card.") do |event, *args|
 		when 1..52
 			card = cards[0].sample + " of " + cards[1].sample
 		when 53
-			card = "Joker (with tm)"
+			card = "Joker:tm:"
 		when 54
-			card = "Joker (without TM)"
+			card = "Joker"
 		end 
-		cardString += card + "\n"
+		cardString += card
+		if domtOne || domtTwo
+			domtText = DoMT::drawCard(card, numCards > 1) #domtInfo[card] % (numCards > 1 ? ["```", "```"] : ["", ""])
+			cardString += " - " + domtText
+		end
+		cardString += "\n"
 	end
 	cardString.strip!
 	cardString = "\n" + cardString if numCards > 1
+	if ("You drew: " + cardString).length > maxDiscordMsgChars
+		event.respond "Too many cards, too much text. Sorry."
+		break
+	end
 	event.respond "You drew: " + cardString
 end
 
@@ -256,7 +290,7 @@ bot.command(:wroll, description: 'Rolls dice, but with a specific weighting algo
 end
 
 def pickRandomOption(listString)
-	options = listString.gsub(/or/, ',').gsub(/,\s*,+/,',').gsub(/\?/,'')
+	options = listString.gsub(/ or /, ',').gsub(/,\s*,+/,',').gsub(/\?/,'')
 	choice = options.split(',').sample
 	puts options
 	return choice.strip
@@ -303,31 +337,44 @@ bot.command(:invite_url, help_available: false) do |event|
 	break unless event.user.id == $sea_client_id
 	event.bot.invite_url
 end
-bot.command(:boop, help_available: false) do |event|
+bot.command(:hug, help_available: false) do |event, *args|
+	break if !args[0].nil?
+	event.respond ["_hugs %s back_", "_picks %s up and hugs them firmly_", "_hug of %s_", "_gives %s a big ol' ~~bear~~ doggo hug_" ].sample % event.user.display_name
+end
+bot.command(:boop, help_available: false) do |event, *args|
+	break if !args[0].nil?
 	event.respond "[scrunch]"
 end
-bot.command(:pet, help_available: false) do |event|
+bot.command(:pet, help_available: false) do |event, *args|
+	break if !args[0].nil?
 	event.respond "[happy doggo noises]"
 end
-bot.command(:patpat, help_available: false) do |event|
+bot.command(:patpat, help_available: false) do |event, *args|
+	break if !args[0].nil?
 	event.respond "[happy doggo noises]"
 end
-bot.command(:brushie, help_available: false) do |event|
+bot.command(:brushie, help_available: false) do |event, *args|
+	break if !args[0].nil?
 	event.respond "[happy doggo noises]"
 end
-bot.command(:feed, help_available: false) do |event|
+bot.command(:feed, help_available: false) do |event, *args|
+	break if !args[0].nil?
 	event.respond "[happy munching doggo noises]"
 end
-bot.command(:biscuit, help_available: false) do |event|
+bot.command(:biscuit, help_available: false) do |event, *args|
+	break if !args[0].nil?
 	event.respond "[happy munching doggo noises]"
 end
-bot.command(:treat, help_available: false) do |event|
+bot.command(:treat, help_available: false) do |event, *args|
+	break if !args[0].nil?
 	event.respond "[happy munching doggo noises]"
 end
-bot.command(:newspaper, help_available: false) do |event|
+bot.command(:newspaper, help_available: false) do |event, *args|
+	break if !args[0].nil?
 	event.respond ["Pony knows not what they do.", "Do not!", "_:newspaper2: @ u_"].sample
 end
-bot.command(:spritz, help_available: false) do |event|
+bot.command(:spritz, help_available: false) do |event, *args|
+	break if !args[0].nil?
 	event.respond "[unhappy doggo noises]"
 end
 
@@ -349,7 +396,7 @@ end
 bot.message do |event|
 	msg = event.message.to_s.chomp
 	respondWithFortune = (msg =~ /(#{surfName},.*\?)|(#{surfName}\?$)/i)
-	respondWithRandom = (msg =~ /#{surfName},.*or.*\?/i)
+	respondWithRandom = (msg =~ /#{surfName},.*\Wor\W.*\?/i)
 	if respondWithRandom
 		options = msg.slice((surfName.length+1)..-1)
 		event.respond randomResponses.sample % [pickRandomOption(options)]
