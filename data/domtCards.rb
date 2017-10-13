@@ -1,12 +1,18 @@
-module DoMT
-	@@domtInfo = {
+# domtCards.rb
+# Author: Natleyn, TODO: the guy who made the cards
+# Version: 1.0.0
+# Holds the information on cards in the Deck of Many Things homebrew edition for D&D5e.
+
+module SurfBot; module Plugins
+module DrawCards; module DoMT
+	@@domt_cards = {
 		"Two of Clubs" => "Idiot\n```Permanently reduce your Intelligence by 1d4 + 1 (to a minimum score of 1). You can draw one additional card beyond your declared draws.```\n",
 		"Three of Clubs" => "Chance\n```Every time you flip a coin, you will always lose the outcome. In any game that relies on chance, you are at disadvantage. Only a wish spell or divine intervention can end this suffering.```\n",
-		"Four of Clubs" => "Idol\n```You beome the idol of a cult that believes you need to be sacrificed for them to be able to achieve their goals. The cult is aware of your location when you drew the card, as well as your name and race.```\n",
+		"Four of Clubs" => "Idol\n```You become the idol of a cult that believes you need to be sacrificed for them to be able to achieve their goals. The cult is aware of your location when you drew the card, as well as your name and race.```\n",
 		"Five of Clubs" => "Cold\n```A shivering wind emanates from the cold towards a randomly determined limb. You take 55 (10d10) cold damage, and the limb freezes. If the damage is equal to or greater than half your health, the limb falls off.```\n",
 		"Six of Clubs" => "Consort\n```A nonplayer character of the DM's choice becomes madly in love with you and obsesses over you. The identity of your new love isn't known until the NPC or someone else reveals it. Nothing less than a wish spell or Divine Intervention can end the NPC's love toward you.```\n",
 		"Seven of Clubs" => "Shift\n```Any creatures within 30ft must succeed on a DC 19 intelligence saving throw or be forced to switch bodies with another creature that also failed the saving throw. If less than two people fail their saving throws, this effect does not occur. You obtain their strength, dexterity, and constitution but retain your class features and intelligence, wisdom, charisma. Only divine intervention, a wish spell, or a magic jar spell can end this effect.```\n",
-		"Eight of Clubs" => "Pack\n```A gnoll war band is alerted to your location, thinking the signal is from yeenghou, and begins marching towards the location the card was drawn.```\n",
+		"Eight of Clubs" => "Pack\n```A gnoll war band is alerted to your location, thinking the signal is from yeenoghu, and begins marching towards the location the card was drawn.```\n",
 		"Nine of Clubs" => "Night\n```When you next fall asleep, a monster comes to you- as in the effects of a dream spell- and delivers a threatning message. In 2d4 days, the monster confronts you and attempts to kill you. If this succeeds, your soul belongs to the creature, and you cannot be brought back without killing the creature.```\n",
 		"Ten of Clubs" => "Blood\n```Any blood that touches your body turns to acid. Whenever you are hit by a melee attack, you will take 23 (5d8) acid damage. This effect can be lessened by 1d8 for every greater restoration that is cast on you, or ended instantly by divine intervention or a wish spell.```\n",
 		"Jack of Clubs" => "Skull\n```You summon an avatar of death: a ghostly humanoid Skeleton, clad in a tattered black robe and carrying a spectral scythe. It appears in a space of the DM's choosing within 10 feet of your character and attacks you, warning all others that you must win the battle alone. The avatar fights until you die or it drops to 0 hit points, whereupon it disappears. If anyone tries to help you, the helper summons its own avatar of death. A creature slain by an avatar of death can't be restored to life.```\n",
@@ -44,9 +50,9 @@ module DoMT
 	
 		"Two of Spades" => "Balance\n```Your mind suffers a wrenching alteration, causing your alignment to change. Lawful becomes chaotic, good becomes evil, and vice versa. If you are true neutral or unaligned, this card has no effect on you.```\n",
 		"Three of Spades" => "Betrayer\n```At any time you choose within one year of drawing this card, you can ask a question in meditation and mentally receive an answer to that question. The answer appears truthful but in actuality will be a lie designed to lead you to your death or fail your objectives.```\n",
-		"Four of Spades" => "Liar\n```For the next 2d4 days, you are unable to lie. However, any time you lie, only you hear the lie whilst all others hear the truth.```\n",
+		"Four of Spades" => "Liar\n```For the next 2d4 days, you are unable to lie to others, with one catch: you don't know you're not lying. While you hear your lie, all others hear the truth. This effect does not prevent your character from learning this fact.```\n",
 		"Five of Spades" => "Impersonator\n```An exact replica of you- in your current physical state- appears in the world with the sole goal of tracking you down and replacing you. They have The same class (although they can be a different archetype) and stats, though their alignment is the opposite of yours. They know your location at the time of drawing the card.```\n",
-		"Six of Spades" => "Lost\n```You become trapped within a labrynthine demiplane as if a maze spell had been cast on you. Make three Intelligence checks: if you fail 3, you are trapped for ten days; if you succeed on 3, you are trapped for an hour. If you roll in between, you are trapped for an appropriate time of the DM's choosing between 10 days and an hour.```\n",
+		"Six of Spades" => "Lost\n```You become trapped within a labrynthine demiplane as if a Maze spell had been cast on you. Make three DC20 Intelligence checks: if you succeed on 3, you are trapped for an hour; if you fail on 3, you are trapped for ten days. If you roll in between, you are trapped for an appropriate time of the DM's choosing between those two times.```\n",
 		"Seven of Spades" => "Gambler\n```The card instantly turns into a coin within your hand and you feel an overwhelming urge to flip it. On heads, your money doubles and appears at your feet. On tails, your gold dissapears.```\n",
 		"Eight of Spades" => "Pheonix\n```You immediately die, exploding as 9th level fireball spell is cast, centered on yourself (DC 20 for anyone within the 20ft radius or take 56 (16d6) fire damage), and then come back to life as if by the Reincarnate spell.```\n",
 		"Nine of Spades" => "Doctor\n```You are transported 150 years into the past, to the same place or nearest available space. After 10 years in the new time zone, you are transported forward in time to exactly 10 seconds after you drew the card.```\n",
@@ -60,8 +66,9 @@ module DoMT
 		"Joker" => "Jester\n```You gain 10,000 XP, or you can draw two additional cards beyond your declared draws.```\n"
 	}
 
-	def DoMT.drawCard(cardName, addCodeBlockQuotes)
-		@@domtInfo[cardName] #% (addCodeBlockQuotes ? ["```","```"] : ["",""])
+	def self.draw_card(card_name)
+		@@domt_cards[card_name]
 	end
 
-end
+end; end # DoMT; DrawCards
+end; end # Plugins; SurfBot
