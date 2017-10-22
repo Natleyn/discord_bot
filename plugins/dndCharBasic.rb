@@ -1,5 +1,5 @@
 # dndCharBasic.rb
-# Author: Natleyn
+# Author: natleyn
 # Version: 2.0.0
 # Puts out basic D&D 5e character ideas; includes options for MLP characters.
 
@@ -24,12 +24,12 @@ module DNDCharBasic
 	@@genders = {
 		"male" => 45,
 		"female" => 45,
-		"trap male" => 5,
-		"trap female" => 5
+		"female-presenting male" => 5,
+		"male-presenting female" => 5
 	}
 
 	@@racesMaxWeight=100
-	@@races = {
+	@@pony_races = {
 		"Earth Pony" => 13,
 		"Pegasus" => 13,
 		"Unicorn" => 13,
@@ -88,7 +88,7 @@ module DNDCharBasic
 	def DNDCharBasic::rngPony()
 		charAlign = @@alignments.sample
 		charGender = rwe(@@genders,@@gendersMaxWeight)
-		charRace = rwe(@@races,@@racesMaxWeight)
+		charRace = rwe(@@pony_races,@@racesMaxWeight)
 		charClass = @@classes.sample
 		charSubclass = @@subclasses[charClass].sample
 		return @@suggestions_pony.sample % [charAlign, charGender, charRace, charSubclass, charClass]

@@ -59,5 +59,6 @@ module Test
 		remove_command(:test)
 		remove_command(:embedtest)
 	end
+
 end # Test
 end; end # Plugins; SurfBot

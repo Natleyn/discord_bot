@@ -3,7 +3,7 @@
 # Version: 1.0.0
 # Contains the background info for fortune (yes/no responses) and random choice (pick from user provided list)
 
-require_relative '../surfBotInfo'
+require_relative '../surfBotInfo2'
 
 module SurfBot; module Plugins
 module Fortune

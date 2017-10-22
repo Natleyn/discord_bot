@@ -1,7 +1,10 @@
 # roll.rb
-# Author: Natleyn
-# Version: 1.0.0
+# Author: natleyn
+# Version: 1.0.1
 # Allows you to roll dice, or to roll on D&D5e's official Wild Magic Surge table (WMS), or on a homebrew Wild Magic Surge table (WMS2)
+# Changelog:
+# 1.0.1
+#  - Fixed an error in default die application ([-+] was not what I thought it was and didn't include x; moved to [x\-+])
 
 require_relative '../surfBotInfo2'
 require_relative '../data/wmsInfo'
@@ -18,13 +21,14 @@ module Roll
 	def self.weighted_roll(max); return 1; end
 
 	def self.roll_dice(input, weight_rolls, full_roll_text)
-		# Wild Magic Surge exception? might wanna put this elsewhere because it won't show up on help.
+		# Wild Magic Surge; might wanna put this elsewhere because it won't show up on help.
 		if(input =~ /^wms$/i) ; return WMS::roll_WMS() ; end
 		if(input =~ /^wms2$/i) ; return WMS2::roll_WMS() ; end
-		# Check if the first argument is a 
+		# Check if the first argument is empty (refer to default die), starts with +/-/x (apply to default die), or
+		# 
 		if input.nil? || !(input =~ /\A.*\d.*\z/)
 			roll_data = @@default_die
-		elsif input =~ /\A[-+].*\z/
+		elsif input =~ /\A[x\-+].*\z/
 			roll_data = "#{@@default_die}#{input.strip}"
 		else	
 			roll_data = input.strip
@@ -156,9 +160,9 @@ module Roll
 
 	def self.clean_up; end
 	def self.stop
+		remove_command(:reseed)
 		remove_command(:roll)
 		remove_command(:wroll)
-		remove_command(:reseed)
 	end
 
 end # Roll

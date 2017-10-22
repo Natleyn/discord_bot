@@ -1,6 +1,6 @@
 # surfBot2.rb
-# author: natleyn
-#
+# Author: natleyn
+# Version: 2.0.2
 # Main file holding the core of SurfBot.
 # You can add functionality by extending the bot with plugins placed in ./plugins/ 
 
@@ -26,6 +26,10 @@ module SurfBot
 
 	################################### Plugin Manager Start ###################################
 
+	class DuplicatePluginError < StandardError
+		def initialize(msg="Duplicate file in ./plugins"); super(msg); end
+	end	
+
 	# plugin_list[filename] => module_name
 	@plugin_list = {}
 
@@ -39,15 +43,13 @@ module SurfBot
 			plugin_filename = plugin_file.scan(/\w+\.rb$/)
 			print "Loading plugin #{plugin_filename}...  "
 			begin
-				raise StandardError if @plugin_list.include?(plugin_filename)
+				raise DuplicatePluginError if @plugin_list.include?(plugin_filename)
 				load "#{plugin_file}"
 				@plugin_list[plugin_filename] = ""
 				# check plugin for stuff like name, version, description
 				print "success."
-			rescue LoadError
-				print "LoadError:#{$!.backtrace[0].split(":")[1]}: loading #{plugin_file}: #{$!}. Skipping..."
-			rescue StandardError
-				print "StandardError:#{$!.backtrace[0].split(":")[1]}: loading #{plugin_file}: #{$!} Skipping..."
+			rescue DuplicatePluginError, SyntaxError, LoadError, StandardError
+				print "failed: #{$!} (#{$!.class})"
 			end
 			print "\n"
 		end
@@ -59,8 +61,8 @@ module SurfBot
 				#puts "Adding #{module_name} in #{Plugins.const_get(module_name).filename} to plugin list"
 				include!( current_module )
 				@plugin_list[current_module.filename] = current_module
-			rescue
-				puts "Error:#{module_name}:#{$!.backtrace[0].split(":")[1]}: #{$!}"
+			rescue StandardError, SyntaxError, LoadError
+				puts "failed: #{$!} (#{$!.class})"
 			end
 		end
 	end
@@ -72,13 +74,13 @@ module SurfBot
 		begin
 			plugin_path = "./plugins/#{plugin_filename}"
 			# if the file is already loaded, cleanup first
-			@plugin_list[plugin_filename].clean_up
+			@plugin_list[plugin_filename].clean_up if @plugin_list.include?(plugin_filename)
 			load plugin_path
 			include!(@plugin_list[plugin_filename])
 			puts "success."
 			event << "Success."
-		rescue
-			puts "failed: #{$!}"
+		rescue StandardError, SyntaxError, LoadError
+			puts "failed: #{$!} (#{$!.class})"
 			event << "Failure."
 		end
 	end
@@ -90,8 +92,8 @@ module SurfBot
 			@plugin_list[plugin_file_name].stop
 			puts "success."
 			event << "Success."
-		rescue
-			puts "failed: #{$!}"
+		rescue StandardError, SyntaxError, LoadError
+			puts "failed: #{$!} (#{$!.class})"
 			event << "Failure."
 		end
 	end

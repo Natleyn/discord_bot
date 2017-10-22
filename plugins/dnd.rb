@@ -30,9 +30,7 @@ module DnD
 	end
 
 	def self.clean_up; end
+	def self.stop; remove_command(:dndstats); end
 
-	def self.stop
-		remove_command(:dndstats)
-	end
 end # DnD
 end; end # Plugins; SurfBot

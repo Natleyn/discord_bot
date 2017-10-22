@@ -3,8 +3,8 @@
 # Version: 1.0.0
 # The event plugin for handling fortune/random messages that don't come through commands. 
 
-require_relative '../data/fortune.rb'
-require_relative '../surfBotInfo2.rb'
+require_relative '../data/fortune'
+require_relative '../surfBotInfo2'
 
 module SurfBot; module Plugins
 module Fortune
@@ -27,5 +27,6 @@ module Fortune
 	# TODO: Look into Discordrb::Await as an alternative
 	def self.clean_up; end
 	def self.stop; end
+
 end # Fortune
 end; end # Plugins; SurfBot

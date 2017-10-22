@@ -1,7 +1,7 @@
 # roleplay.rb
 # Author: natleyn
 # Version: 1.0.0
-# Holds commands that are mainly used to interact with the bot like a sentient entity.
+# Holds commands that are mainly used to interact with the bot like a (somewhat) sentient entity.
 
 module SurfBot; module Plugins
 module Roleplay
@@ -69,8 +69,25 @@ module Roleplay
 		break if !args[0].nil?
 		event << "[unhappy wopped doggo noises]"
 	end
-end
-end; end
+
+	def self.clean_up; end
+	def self.stop
+		remove_command(:hug)
+		remove_command(:boop)
+		remove_command(:pet)
+		remove_command(:patpat)
+		remove_command(:brushie)
+		remove_command(:feed)
+		remove_command(:biscuit)
+		remove_command(:treat)
+		remove_command(:newspaper)
+		remove_command(:spritz)
+		remove_command(:hose)
+		remove_command(:wop)
+	end
+
+end # Roleplay
+end; end # Plugins; SurfBot
 
 
 

@@ -4,7 +4,7 @@
 # Holds the commands for using fortune/random.
 
 require_relative '../data/fortune'
-require_relative '../surfBotInfo'
+require_relative '../surfBotInfo2'
 
 module SurfBot; module Plugins
 module Fortune
