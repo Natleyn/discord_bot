@@ -1,7 +1,9 @@
 # fortune.rb
 # Author: natleyn
-# Version: 1.0.0
+# Version: 1.0.1
 # Contains the background info for fortune (yes/no responses) and random choice (pick from user provided list)
+# 1.0.1
+#  - Changed the final substitution for gathering input (gsub(/\?/) -> sub(/\?+\z/)
 
 require_relative '../surfBotInfo2'
 
@@ -46,7 +48,7 @@ module Fortune
 
 	
 	def self.pick_random_option(list_string)
-		options = list_string.gsub(/ or /, ',').gsub(/,\s*,+/,',').gsub(/\?/,'')
+		options = list_string.gsub(/ or /, ',').gsub(/(,\s*)+/,',').sub(/\?+\z/,'')
 		lists = []
 		choices = ""
 		options.split(';').each do |option_list|

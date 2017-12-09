@@ -1,7 +1,13 @@
 # roleplay.rb
 # Author: natleyn
-# Version: 1.0.0
+# Version: 1.0.1
 # Holds commands that are mainly used to interact with the bot like a (somewhat) sentient entity.
+# Changelog:
+# 1.0.1
+#  - Added random weighted element command (might just put that in the kernel) and made scrunches
+#    work on a weighted array
+
+require_relative '../data/extraFunctions'
 
 module SurfBot; module Plugins
 module Roleplay
@@ -19,7 +25,12 @@ module Roleplay
 		"Do not!",
 		"_:newspaper2: @ u_"
 	]
-	
+	@@scrunch_list = {
+		"[scrunch]" => 10,
+		"<:scrunch:327935535278456833>" => 9,
+		"( ( <:scrunch:327935535278456833> ) )" => 1
+	}
+
 	# Generic commands
 	command(:hug, help_available: false) do |event, *args|
 		break if !args[0].nil?
@@ -27,7 +38,7 @@ module Roleplay
 	end
 	command(:boop, help_available: false) do |event, *args|
 		break if !args[0].nil?
-		event << "[scrunch]"
+		event << rwe(@@scrunch_list)
 	end
 	command(:pet, help_available: false) do |event, *args|
 		break if !args[0].nil?

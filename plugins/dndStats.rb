@@ -1,12 +1,15 @@
-# dnd.rb
+# dndStats.rb
 # Author: natleyn
-# Version: 1.0.0
+# Version: 1.0.1
 # Chooses two attributes from Dungeons and Dragons to be a hypothetical character's high and low points.
+# Changelog:
+# 1.0.1
+#  - Minor under-the-hood change.
 
 module SurfBot; module Plugins
-module DnD
+module DnDStats
 	extend Discordrb::Commands::CommandContainer
-	def self.filename; "dnd.rb"; end
+	def self.filename; "dndStats.rb"; end
 
 	@@stats = [
 		"strength",
@@ -19,8 +22,8 @@ module DnD
 
 	def self.roll_stats()
 		high = @@stats.sample
-		lowList = @@stats.reject { |stat| stat == high }
-		return [ high, lowList.sample ]
+		low = (@@stats - [high]).sample
+		return [ high, low ]
 	end
 
 	command(:dndstats,
@@ -32,5 +35,5 @@ module DnD
 	def self.clean_up; end
 	def self.stop; remove_command(:dndstats); end
 
-end # DnD
+end # DnDStats
 end; end # Plugins; SurfBot

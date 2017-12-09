@@ -1,7 +1,12 @@
 # dndCharBasic.rb
 # Author: natleyn
-# Version: 2.0.0
+# Version: 2.0.1
 # Puts out basic D&D 5e character ideas; includes options for MLP characters.
+# Changelog:
+# 2.0.1
+#  - Moved rwe (random weighted element) to data/extraFunctions.rb as part of the Kernel module
+
+require_relative '../data/extraFunctions'
 
 module SurfBot; module Plugins
 module DNDCharBasic
@@ -72,17 +77,6 @@ module DNDCharBasic
 		"Warlock" => ["Archfey Patron", "Fiend Patron", "Great Old One Patron", "Changeling Queen Patron"],
 		"Wizard" => ["Abjuration", "Conjuration", "Divination", "Enchantment", "Evocation", "Illusion", "Necromancy", "Transmutation" ]
 	}
-
-	def DNDCharBasic::rwe(weightedHash, totalWeight)
-		sum = 0
-		rng = rand(1..totalWeight)
-		weightedHash.each do |key, value|
-			sum += value
-			if rng <= sum then
-				return key
-			end
-		end
-	end
 
 	@@suggestions_pony = ["%s %s %s, %s %s?", "Pony might like a %s %s %s, who is %s %s.", "Pony should make a %s %s %s who is a %s %s!"]
 	def DNDCharBasic::rngPony()
