@@ -40,7 +40,7 @@ module SurfBot
 	def self.init_plugins
 		# First, require all plugin files ...
 		Dir['./plugins/*'].each do |plugin_file|
-			plugin_filename = plugin_file.scan(/\w+\.rb$/)
+			plugin_filename = plugin_file.scan(/\w+\.rb$/)[0]
 			print "Loading plugin #{plugin_filename}...  "
 			begin
 				raise DuplicatePluginError if @plugin_list.include?(plugin_filename)
@@ -68,42 +68,43 @@ module SurfBot
 	end
 
 
-	@bot.command(:load_plugin, help_available: false, min_args: 1, max_args: 1, usage: ";load_plugin <plugin_filename>") do |event, *args|
-		plugin_filename = args[0]
-		print "Attempting to load plugin #{plugin_filename}...  "
+	@bot.command(   :plugin,
+			help_available: false,
+			min_args: 1,
+			max_args: 3,
+			usage: "#{SurfBot.surf_cmd_prefix}plugin list/load/stop <plugin name for load/stop>"
+			) do |event, *args|
+		break unless event.user.id == @sea_client_id
 		begin
-			plugin_path = "./plugins/#{plugin_filename}"
-			# if the file is already loaded, cleanup first
-			@plugin_list[plugin_filename].clean_up if @plugin_list.include?(plugin_filename)
-			load plugin_path
-			include!(@plugin_list[plugin_filename])
-			puts "success."
-			event << "Success."
+			plugin_filename = args[1]
+			case args[0]
+			when /load/i
+				print "Attempting to load plugin #{plugin_filename}...  "
+				plugin_path = "./plugins/#{plugin_filename}"
+				# if the file is already loaded, cleanup first
+				@plugin_list[plugin_filename].clean_up if @plugin_list.include?(plugin_filename)
+				load plugin_path
+				include!(@plugin_list[plugin_filename])
+			when /stop/i
+				print "Stopping plugin #{plugin_filename}... "
+				@plugin_list[plugin_filename].stop
+			when /list/i
+				list = "Plugins:```\n"
+				@plugin_list.each do |filename, module_name|
+					list += "#{filename} => #{module_name.to_s.split("::")[2]}\n"
+				end
+				list += "```"
+				event << list.slice(0..-1)
+			else
+				event << "Check usage"
+			end
+			puts "success." if !args[0].match? /list/i
+			event << "Success." if !args[0].match? /list/i
 		rescue StandardError, SyntaxError, LoadError
 			puts "failed: #{$!} (#{$!.class})"
 			event << "Failure."
 		end
-	end
-
-	@bot.command(:stop_plugin, help_available: false, min_args: 1, max_args: 1, usage: ";stop_plugin <plugin_filename>") do |event, *args|
-		plugin_file_name = args[0]
-		print "Stopping plugin #{plugin_file_name}... "
-		begin
-			@plugin_list[plugin_file_name].stop
-			puts "success."
-			event << "Success."
-		rescue StandardError, SyntaxError, LoadError
-			puts "failed: #{$!} (#{$!.class})"
-			event << "Failure."
-		end
-	end
-
-	@bot.command(:list_plugins, help_available: false) do |event|
-		list = "Plugins: "
-		@plugin_list.each do |filename, module_name|
-			list += "#{module_name}, "
-		end
-		event.respond list.slice(0..-3)
+		
 	end
 	################################### Plugin Manager End ###################################
 
@@ -117,7 +118,7 @@ module SurfBot
 	@bot.command(:say, help_available: false) do |event, *args|
 		break unless event.user.id == @sea_client_id
 		break if args[0].nil?
-		if(args[0] =~ /[0-9]+/)
+		if(args[0].match? /^[0-9]+$/ )
 			@bot.send_message(Integer(args[0]), event.message.to_s[24..-1])
 		else
 				event.respond event.message.to_s[5..-1]
