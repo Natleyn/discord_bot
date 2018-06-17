@@ -1,7 +1,10 @@
 # extraFunctions.rb
 # Author: natleyn
-# Version: 1.1.0
+# Version: 1.1.1
 # Holds some functions I find useful enough to make available everywhere.
+# Changelog:
+# 1.1.1
+#  - Variable name wasn't updated, has now been fixed
 
 module Kernel
 	def remove_lowest(input, to_remove=1)
@@ -38,7 +41,7 @@ module Kernel
 		rng = rand(1..max)
 		weighted_hash.each do |key, value|
 			sum += value
-			if random_number <= sum
+			if rng <= sum
 				return key
 			end
 		end
