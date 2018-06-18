@@ -11,15 +11,13 @@ module Test
 	def self.filename; "testPlugin.rb"; end
 
 	command(:test, help_available: false) do |event|
-		#event.respond "test" % ["test"]
-		bot.command(:test2, help_available: false) do |event|
-			event.respond "It worked!"
-		end
+		break unless event.user.id == SurfBot.sea_client_id
+		event.respond "<:ohno:343549226422370314>"
 	end
 	
 
 	command(:embedtest, help_available: false) do |event|
-		break unless event.user.id == $sea_client_id
+		break unless event.user.id == SurfBot.sea_client_id
 
 		#embed = Discordrb::Webhooks::Embed.new
 	
@@ -51,13 +49,21 @@ module Test
 			embed.add_field(name: "Wis", value: "10", inline: true)
 			embed.add_field(name: "Cha", value: "10", inline: true)
 		end
-		
+	end
+
+
+	command(:mention,
+		description: "Posts a temporary message with a mention, to correct phantom mentions."
+		) do |event|
+		event.send_temporary_message("#{event.user.mention}", 30.0)		
 	end
 
 	def self.clean_up; end
+	def self.save_data; end
 	def self.stop
 		remove_command(:test)
 		remove_command(:embedtest)
+		remove_command(:mention)
 	end
 
 end # Test

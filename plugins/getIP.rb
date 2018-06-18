@@ -23,6 +23,7 @@ module GetIP
 
 
 	def self.clean_up; end
+	def self.save_data; end
 	def self.stop; remove_command(:get_public_ip); end
 	
 end # GetIP

@@ -39,6 +39,7 @@ module DrawCards
 		
 	end
 
+	# TODO: put this stuff into draw_card
 	command(:draw,
 		description: "Draw up to 10 cards from a standard 54 card deck, or up to four cards from the D&D5e DoMT (Deck of Many Things).",
 		) do |event, *args|
@@ -98,6 +99,7 @@ module DrawCards
 	end
 
 	def self.clean_up; end
+	def self.save_data; end
 	def self.stop; remove_command(:draw); end
 
 end # DrawCards

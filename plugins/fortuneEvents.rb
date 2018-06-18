@@ -13,8 +13,8 @@ module Fortune
 
 	message do |event|
 		msg = event.message.to_s.chomp
-		do_fortune = (msg =~ /(^#{SurfBot.surf_name},.*\?$)|(^.*#{SurfBot.surf_name}\?$)/i)
-		do_random = (msg =~ /^#{SurfBot.surf_name},.*\Wor\W.*\?$/i)
+		do_fortune = (msg.match? /(^#{SurfBot.surf_name},.*\?$)|(^.*#{SurfBot.surf_name}\?$)/i )
+		do_random = (msg.match? /^#{SurfBot.surf_name},.*\Wor\W.*\?$/i )
 		if do_random
 			options = msg.slice((SurfBot.surf_name.length+1)..-1)
 			event.respond @@random_responses.sample % [pick_random_option(options)]
@@ -26,6 +26,7 @@ module Fortune
 	# No instance variables to clean up- can't stop event handlers either
 	# TODO: Look into Discordrb::Await as an alternative
 	def self.clean_up; end
+	def self.save_data; end
 	def self.stop; end
 
 end # Fortune

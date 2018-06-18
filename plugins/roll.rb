@@ -109,7 +109,7 @@ module Roll
 	#	0 rolled numbers and constants in order,
 	#	1 the sum of above,
 	#	2 the same rolls but with the dice dropped,
-	#	3 the sum of above (without the dropped dice),
+	#	3 the sum of above (without the dice that were dropped),
 	#	4 the sum of all constants (for simplifying later calculations, namely dice sum)
 	#	5 the number of numbers (dice and constants) in this roll, for deciding whether or not to shorten it.
 	def self.calculate_roll(numbers, roll_symbols, signs, weight)
@@ -189,12 +189,13 @@ module Roll
 	end
 
 	# roll_dice 2.0: split various functionality into other functions for both testing and simplicity purposes.
-	def self.roll_dice_b(input, weight_rolls, args)
+	def self.roll_dice(input, weight_rolls, args)
 		#puts "input #{input}" # DEBUG
 		# Check args for various keywords for use in options later
 		full_roll_text = args.any? { |arg| arg.match? /full/i }
 		advantage = args.any? { |arg| arg.match? /adv(antage)?/i }
 		disadvantage = args.any? { |arg| arg.match? /dis(advantage)?/i }
+		average = args.any? { |arg| arg.match? /(avg|average)/i }
 		
 		dd_input = apply_default_die(input, advantage, disadvantage)
 		#puts "default_die #{dd_input}" # DEBUG
@@ -244,7 +245,7 @@ module Roll
 		elsif input.match? /^wms2$/i
 			output = WMS2::roll_WMS()
 		else
-			output = roll_dice_b(input, false, args)
+			output = roll_dice(input, false, args)
 		end
 		event << output
 	end
@@ -257,6 +258,7 @@ module Roll
 	end
 
 	def self.clean_up; end
+	def self.save_data; end
 	def self.stop
 		remove_command(:reseed)
 		remove_command(:roll)

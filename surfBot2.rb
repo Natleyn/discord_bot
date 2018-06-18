@@ -1,17 +1,19 @@
 # surfBot2.rb
 # Author: natleyn
-# Version: 2.0.2
+# Version: 2.0.3
 # Main file holding the core of SurfBot.
 # You can add functionality by extending the bot with plugins placed in ./plugins/ 
-
-
+# Changelog:
+# 2.0.3
+# - removed duplicate code
+# - added code to save data within all plugins
 
 
 require 'discordrb'
 
 module SurfBot
 
-	@log_messages_to_console = false
+	@log_messages_to_console = true
 
 	version = "2.0.1"
 
@@ -19,9 +21,6 @@ module SurfBot
 
 	# initialize the bot
 	@bot = Discordrb::Commands::CommandBot.new( token: @surf_client_token, client_id: @surf_client_token, prefix: @surf_cmd_prefix )
-	def self.include!(module_name)
-		@bot.include! module_name
-	end
 
 
 	################################### Plugin Manager Start ###################################
@@ -161,7 +160,7 @@ module SurfBot
 	# Logging messages to console
 	@bot.message do |event|
 		#break if event.user.id == $choosieID
-		if !@derpi_ignored_users.include?(event.user.id)
+		if !@ignored_users.include?(event.user.id)
 			unless event.channel.type == 1
 				server_name = event.channel.server.name
 				channel_name = "#" + event.channel.name
@@ -183,13 +182,19 @@ module SurfBot
 	init_plugins
 
 	# display when you arrive
-	@entry_channels.each do |channel| ; @bot.send_message(channel, "Watashi ga kita!"); end
+	@entry_channels.each do |channel| ; @bot.send_temporary_message(channel, "Watashi ga kita!", 30.0); end
 
 	# If you use :async, The bot will cease to run if you don't bot.sync after starting it 
 	# asynchronously and you don't loop until something forces an exit
 	@bot.sync
 
 	at_exit do
+		# Save all plugin data
+		SurfBot::Plugins.constants.each do |module_name|
+			Plugins.const_get(module_name).save_data
+		end
+
+
 		puts "I sleep."
 	end
 end

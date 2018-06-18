@@ -82,6 +82,7 @@ module Roleplay
 	end
 
 	def self.clean_up; end
+	def self.save_data; end
 	def self.stop
 		remove_command(:hug)
 		remove_command(:boop)

@@ -21,6 +21,7 @@ module Fortune
 
 
 	def self.clean_up; end
+	def self.save_data; end
 	def self.stop; remove_command(:fortune); end
 
 end # Fortune

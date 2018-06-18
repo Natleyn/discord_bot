@@ -1,5 +1,5 @@
 # basePlugin.rb
-# author: natleyn
+# Author: natleyn
 # Version 1.0.0
 # An example plugin to base further plugins off of. 
 
@@ -31,6 +31,10 @@ module BasePlugin
 	# You can shorten these two functions to one line if they're not doing anything complex
 	def self.clean_up
 		# Clean instance vars here so 'load'ing this plugin doesn't add onto them
+	end
+	def self.save_data
+		# Save any data you want to into local files in a folder named after the plugin filename
+		# i.e. save an array of data as text in data.txt at SurfBot/data/basePlugin/data.txt
 	end
 	def self.stop
 		remove_command(:base_plugin)
