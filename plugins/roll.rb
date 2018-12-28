@@ -3,9 +3,10 @@
 # Version: 3.0.0
 # Allows you to roll dice, or to roll on D&D5e's official Wild Magic Surge table (WMS), or on a homebrew Wild Magic Surge table (WMS2). D&D5e centric.
 # Changelog:
+# 3.0.1
+#  - Added check for array format to print method to catch the case where the user only 'rolls' a flat number.
 # 3.0.0
 #  - Wrote an entirely new roll function, utilizing various smaller functions created with acceptance and integration testing in mind
-#  - Moved a bit of functionality around in doing so- 3.0.0 is incompatible with <2.2.1 due to the major function changes
 #  - Output for the end user has NOT changed, but is easier to modify and test for future changes
 # 2.2.1
 #  - Fixed a lot of faulty code (dropping dice on a roll that included other dice, roll_data being able to modify @@default_die, etc).
@@ -34,10 +35,13 @@ module Roll
 
 	# Constant boundaries
 	@@MAX_DICE = 200
-	@@MAX_SIDES = 100
+	@@MAX_SIDES = 200
 	@@MAX_INPUT_LENGTH = 150 # in chars
 	# How many numbers should be shown before you need to use full to see rolls
 	@@FULL_THRESHOLD = 10
+	# Proper formatting of a dice roll in reged
+	@@ROLL_REGEX = /\A([-+]?((\d+d\d+([Dd]\d+)?)|(\d+)))*(x\d+)?\z/
+
 
 	def self.standard_roll(max); return rand(1..max); end
 	def self.weighted_roll(max); return 1; end
@@ -62,6 +66,10 @@ module Roll
 		roll
 	end
 
+	def self.apply_one_die_shorthand(input)
+		input.gsub(/(^|\D+)(d\d+)($|\D+)/, '\11\2\3')
+	end
+
 	# Removes any characters that aren't used for input.
 	def self.sanitize_roll(input)
 		roll_data = input.dup
@@ -70,6 +78,14 @@ module Roll
 		roll_data.gsub!(/(d)d+/, '\1') # remove consecutive d's
 		roll_data.gsub!(/(D)D+/, '\1') # remove consecutive D's
 		roll_data.gsub!(/(x)x+/, '\1') # remove consecutive x's
+		roll_data
+	end
+
+	# Adds things to the roll as implicated by shorthand.
+	# "dX" - means "1dX"
+	def self.modify_roll(input)
+		roll_data = input.dup
+		roll_data.gsub!(/(^|[^0-9])d([0-9]+)/, '\11d\2')
 		roll_data
 	end
 
@@ -172,10 +188,11 @@ module Roll
 	# Compile the final output string from its parts.
 	def self.form_result(input_text, roll_data, signs, display_full, num_rolls)
 		output = "#{input_text}"
-		#puts "form roll_data #{roll_data}" # DEBUG
+		puts "form roll_data #{roll_data}" # DEBUG
 		result = "#{roll_data[1]}"
-		# only print out the sum if there's one die being rolled
-		if (roll_data[0].length > 1 || roll_data[0][0].length > 1)
+		
+		# only print out the sum if there's more than one die being rolled
+		if (roll_data[0].length > 1 || (roll_data[0][0].kind_of?(Array) ? roll_data[0][0].length > 1 : false) )
 			output << " = #{((display_full || (num_rolls <= @@FULL_THRESHOLD))? stringify_roll(roll_data[0], signs) : stringify_short(roll_data))}"
 		end
 
@@ -197,15 +214,17 @@ module Roll
 		disadvantage = args.any? { |arg| arg.match? /dis(advantage)?/i }
 		average = args.any? { |arg| arg.match? /(avg|average)/i }
 		
-		dd_input = apply_default_die(input, advantage, disadvantage)
+		shorthand_input = apply_one_die_shorthand(input)
+		dd_input = apply_default_die(shorthand_input, advantage, disadvantage)
 		#puts "default_die #{dd_input}" # DEBUG
 
 		sanitized_input = sanitize_roll(dd_input)
+		modified_input = modify_roll(sanitized_input)
 		#puts "sanitized #{sanitized_input}" # DEBUG
-		return "Error in input: Improper dice format (#{sanitized_input})" unless sanitized_input.match?(/\A([-+]?((\d+d\d+([Dd]\d+)?)|(\d+)))*(x\d+)?\z/)
-		return "Error in input: Input too long (Max #{@@MAX_INPUT_LENGTH} chars)" if sanitized_input.length > @@MAX_INPUT_LENGTH
+		return "Error in input: Improper dice format (#{modified_input})" unless modified_input.match?(@@ROLL_REGEX)
+		return "Error in input: Input too long (Max #{@@MAX_INPUT_LENGTH} chars)" if modified_input.length > @@MAX_INPUT_LENGTH
 
-		parsed_input = parse_roll(sanitized_input)
+		parsed_input = parse_roll(modified_input)
 		#puts "parsed #{parsed_input}" # DEBUG
 		# test for #dice #sides
 		return "Error in input: Dropping too many dice." if (parsed_input[0].any? do |e|; Integer(e[2]) >= Integer(e[0]) if (e.respond_to?(:at) && !e.at(2).nil?); end)
@@ -254,7 +273,7 @@ module Roll
 		usage: "#{SurfBot.surf_cmd_prefix}roll <number of dice>d<number of sides on die> [+/- (modifier or additional dice)]"
 			) do |event, *args|
 		input = "#{args[0]}"
-		event << roll_dice_a(input, true, args[0..2])
+		event << roll_dice(input, true, args[0..2])
 	end
 
 	def self.clean_up; end
