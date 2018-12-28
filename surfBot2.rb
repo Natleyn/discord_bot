@@ -36,8 +36,10 @@ module SurfBot
 		@bot.include!(module_name)
 	end
 
+	# Take plugins
 	def self.init_plugins
 		# First, require all plugin files ...
+		puts "[Initializing found plugins...]"
 		Dir['./plugins/*'].each do |plugin_file|
 			plugin_filename = plugin_file.scan(/\w+\.rb$/)[0]
 			print "Loading plugin #{plugin_filename}...  "
@@ -45,13 +47,14 @@ module SurfBot
 				raise DuplicatePluginError if @plugin_list.include?(plugin_filename)
 				load "#{plugin_file}"
 				@plugin_list[plugin_filename] = ""
-				# check plugin for stuff like name, version, description
+				# TODO: check plugin for stuff like name, version, description
 				print "success."
 			rescue DuplicatePluginError, SyntaxError, LoadError, StandardError
 				print "failed: #{$!} (#{$!.class})"
 			end
 			print "\n"
 		end
+		puts "[Plugins initialized. Loading modules...]"
 		# ... and include all plugin modules (unloaded -> loaded)
 		SurfBot::Plugins.constants.each do |module_name|
 			begin
@@ -64,6 +67,7 @@ module SurfBot
 				puts "failed: #{$!} (#{$!.class})"
 			end
 		end
+		puts "[Module loading complete.]"
 	end
 
 
@@ -71,7 +75,7 @@ module SurfBot
 			help_available: false,
 			min_args: 1,
 			max_args: 3,
-			usage: "#{SurfBot.surf_cmd_prefix}plugin list/load/stop <plugin name for load/stop>"
+			usage: "#{SurfBot.surf_cmd_prefix}plugin list/load/save/stop <plugin name for load/stop, w/ save name optional>"
 			) do |event, *args|
 		break unless event.user.id == @sea_client_id
 		begin
@@ -84,6 +88,8 @@ module SurfBot
 				@plugin_list[plugin_filename].clean_up if @plugin_list.include?(plugin_filename)
 				load plugin_path
 				include!(@plugin_list[plugin_filename])
+			when /save/i
+				# TODO: save all plugin data
 			when /stop/i
 				print "Stopping plugin #{plugin_filename}... "
 				@plugin_list[plugin_filename].stop
