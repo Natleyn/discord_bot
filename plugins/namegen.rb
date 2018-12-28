@@ -1,7 +1,15 @@
 # namegen.rb
 # Author: natleyn
-# Version: 0.0.1
+# Version: 1.0.1
 # Generates names through a variety of methods, the default being Markov.
+#
+# Changelog
+# 1.0.2
+#  - Added a method (sea2_gen_name / sea2_gen_suggestion) of generating names from pure random selection of consonants and vowels. May need tweaking.
+# 1.0.1
+#  - Added more ways to generate names- Markov (dataset not implemented yet) and Sea (a method of suggesting letters for use)
+# 1.0.0
+#  - Got basic functionality working and set up for expansion.
 
 require_relative '../data/namegen/pitcockData'
 require_relative '../data/extraFunctions'
@@ -85,6 +93,24 @@ module Namegen
 	def self.sea_gen_suggestion
 		"Try using these: #{@@alphabet.sample}, #{@@alphabet.sample}, #{@@alphabet.sample}, #{@@alphabet.sample}."
 	end
+	
+	def self.sea2_gen_name
+		vowels = ['a','e','i','o','u','y']
+		consonants = @@alphabet - vowels
+		length = rand(3..10)
+		name = "#{(rand(0..1) ? consonants.sample : vowels.sample )}".upcase
+		length.times do
+			if vowels.include?(name[-1])
+				name << ( rand(0..100) < 80 ? consonants.sample : vowels.sample )
+			else
+				name << ( rand(0..100) < 80 ? vowels.sample : consonants.sample )
+			end
+		end
+		name
+	end
+	def self.sea2_gen_suggestion
+		"How about these: #{(7.times.collect { sea2_gen_name } ) * ", "}"
+	end
 
 	command(:namegen,
 		description: "Generates names through a variety of methods; default is IRC (Pitcock).\nOptions: markov, irc, shitty, sea"
@@ -98,8 +124,10 @@ module Namegen
 			output = pitcock_namegen(num_names, false)
 		elsif (input.any? { |e| e.match? /shitty/i })
 			output = pitcock_namegen(num_names, true)
-		elsif (input.any? { |e| e.match? /sea/i })
+		elsif (input.any? { |e| e.match? /sea\b/i })
 			output = sea_gen_suggestion
+		elsif (input.any? { |e| e.match? /sea2/i} )
+			output = sea2_gen_suggestion
 		else
 			output = pitcock_namegen(num_names, false)
 		end
