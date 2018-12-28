@@ -1,6 +1,6 @@
 require 'discordrb'
 # Add plugin here
-require './plugins/roll'
+require '../plugins/roll'
 
 # Test function here
 parse_input = "1d20+2d8d1-4+3d4D2x7"

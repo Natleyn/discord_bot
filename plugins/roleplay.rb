@@ -3,6 +3,8 @@
 # Version: 1.0.1
 # Holds commands that are mainly used to interact with the bot like a (somewhat) sentient entity.
 # Changelog:
+# 1.0.2
+#  - Can now walk the dog.
 # 1.0.1
 #  - Added random weighted element command (might just put that in the kernel) and made scrunches
 #    work on a weighted array
@@ -80,6 +82,11 @@ module Roleplay
 		break if !args[0].nil?
 		event << "[unhappy wopped doggo noises]"
 	end
+	command(:walk, help_available: false) do |event, *args|
+		break if !args[0].nil?
+		event << "[exercising doggo noises]"
+	end
+
 
 	def self.clean_up; end
 	def self.save_data; end
@@ -96,6 +103,7 @@ module Roleplay
 		remove_command(:spritz)
 		remove_command(:hose)
 		remove_command(:wop)
+		remove_command(:walk)
 	end
 
 end # Roleplay

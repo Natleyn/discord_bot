@@ -12,7 +12,7 @@ module Test
 
 	command(:test, help_available: false) do |event|
 		break unless event.user.id == SurfBot.sea_client_id
-		event.respond "<:ohno:343549226422370314>"
+		event.respond "<:ohno:344329083641135118>"
 	end
 	
 
