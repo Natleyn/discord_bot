@@ -1,7 +1,10 @@
 # drawCards.rb
 # Author: natleyn
-# Version: 1.0.0
+# Version: 1.1.0
 # Lets you draw cards, either from a 54 card deck (jokers included) or a homebrew D&D5e Deck of Many Things (DoMT)
+# 1.1.0
+#  - Moved functionality from the command handler to a separate function to facilitate testing and reloadability.
+#  - Refactored existing code to conform to current style patterns.
 
 require_relative '../surfBotInfo2'
 require_relative '../data/domtCards'
@@ -35,42 +38,12 @@ module DrawCards
 		]
 	]
 
-	def self.draw_card(num_cards, domt)
-		
-	end
-
-	# TODO: put this stuff into draw_card
-	command(:draw,
-		description: "Draw up to 10 cards from a standard 54 card deck, or up to four cards from the D&D5e DoMT (Deck of Many Things).",
-		) do |event, *args|
-		# Figure out if we're using the DoMT
-		domt_present = false
-		domt_present = true if args[0] =~ /domt/i || args[1] =~ /domt/i
-		domt_is_2 = false
-		domt_is_2 = true if args[1] =~ /domt/i
-		if domt_present && !domt_is_2
-			num_cards_string = args[1]
-		else
-			num_cards_string = args[0]
-		end
-
-		if !num_cards_string.to_s.strip.nil? && num_cards_string =~ /^[0-9]+$/
-			num = Integer(num_cards_string)
-			if domt_present && num > 4
-				event.respond "Too many DoMT cards! I can't display all that text."
-				return
-			elsif num > 0 && num <= 10
-				num_cards = num
-			elsif num > 10
-				event.respond "Too many cards! Try less than ten."
-				return
-			elsif num <= 0
-				event.respond "Too few cards; you need at least one."
-				return
-			end
-		else
-			num_cards = 1
-		end
+	def self.draw_cards(num_cards, domt)
+		# Limit the number of cards by format.
+		return "You can't draw that many cards, silly." if (num_cards <= 0)
+		return "Too many cards! Try ten or less." if (num_cards > 10)
+		return "Too many DoMT cards. Try less than five." if (domt && num_cards > 5)
+		# Build the string to return
 		card_string = ""
 		num_cards.times do
 			roll = rand(1..54)
@@ -82,20 +55,24 @@ module DrawCards
 			when 54
 				card = "Joker"
 			end 
-			card_string += card
-			if domt_present
-				domt_text = DoMT::draw_card(card)
-				card_string += " - #{domt_text}"
-			end
+			card_string << card
+			card_string << " - #{DoMT::draw_card(card)}" if domt
 			card_string += "\n"
 		end
-		card_string.strip!
-		card_string = "\n" + card_string if num_cards > 1
-		if ("You drew: " + card_string).length > SurfBot.max_discord_msg_chars
-			event.respond "Too many cards, too much text. Sorry."
-			break
-		end
-		event.respond "You drew: #{card_string}"
+		#puts "#c #{num_cards}; domt? #{domt}"
+		card_string = "You drew: #{(num_cards > 1 ? "\n" : "") + card_string.strip!}"
+		return "Too many cards, too much text." if card_string.length > SurfBot.max_discord_msg_chars
+		card_string
+	end
+
+	command(:draw,
+		description: "Draw up to 10 cards from a standard 54 card deck, or up to four cards from the D&D5e DoMT (Deck of Many Things).",
+		) do |event, *args|
+		# Get number of cards being drawn
+		num_cards = ( args.any? { |e| e.match?(/\b\d+\b/) } ? args.find { |e| e.match?(/\b\d+\b/i) }.to_i : 1 )
+		# Figure out if we're using the DoMT
+		domt_present = args.any? { |e| e.match?(/domt\b/i) }
+		event << draw_cards(num_cards, domt_present)
 	end
 
 	def self.clean_up; end
