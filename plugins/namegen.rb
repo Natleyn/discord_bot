@@ -108,8 +108,8 @@ module Namegen
 		end
 		name
 	end
-	def self.sea2_gen_suggestion
-		"How about these: #{(7.times.collect { sea2_gen_name } ) * ", "}"
+	def self.sea2_gen_suggestion(num_names)
+		"How about these: #{(num_names.times.collect { sea2_gen_name } ) * ", "}"
 	end
 
 	command(:namegen,
@@ -127,7 +127,7 @@ module Namegen
 		elsif (input.any? { |e| e.match? /sea\b/i })
 			output = sea_gen_suggestion
 		elsif (input.any? { |e| e.match? /sea2/i} )
-			output = sea2_gen_suggestion
+			output = sea2_gen_suggestion(num_names)
 		else
 			output = pitcock_namegen(num_names, false)
 		end
