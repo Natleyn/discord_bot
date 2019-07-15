@@ -32,6 +32,12 @@ module Roleplay
 		"<:scrunch:327935535278456833>" => 9,
 		"( ( <:scrunch:327935535278456833> ) )" => 1
 	}
+	@@spin_list = {
+		"<:DaydreamSpin1:503267854645329933>" => 4,
+		"<a:DaydreamSpin2:503267873800847380>" => 6,
+		"<a:DaydreamSpin3:503267887612428291>" => 4,
+		"<a:DaydreamSpin4:503267909099847682>" => 2
+	}
 
 	# Generic commands
 	command(:hug, help_available: false) do |event, *args|
@@ -86,7 +92,10 @@ module Roleplay
 		break if !args[0].nil?
 		event << "[exercising doggo noises]"
 	end
-
+	command(:spin, help_available: false) do |event, *args|
+		break if !args[0].nil?
+		event << rwe(@@spin_list)
+	end
 
 	def self.clean_up; end
 	def self.save_data; end
@@ -104,6 +113,7 @@ module Roleplay
 		remove_command(:hose)
 		remove_command(:wop)
 		remove_command(:walk)
+		remove_command(:spin)
 	end
 
 end # Roleplay
