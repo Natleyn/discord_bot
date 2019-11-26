@@ -18,7 +18,8 @@ module GetIP
 		help_available: false
 		) do |event|
 		return unless event.user.id == SurfBot.sea_client_id
-		event << get_ip
+		event.message.delete
+		event.send_temporary_message(get_ip, 30.0)
 	end
 
 

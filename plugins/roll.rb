@@ -188,7 +188,7 @@ module Roll
 	# Compile the final output string from its parts.
 	def self.form_result(input_text, roll_data, signs, display_full, num_rolls)
 		output = "#{input_text}"
-		puts "form roll_data #{roll_data}" # DEBUG
+		#puts "form roll_data #{roll_data}" # DEBUG
 		result = "#{roll_data[1]}"
 		
 		# only print out the sum if there's more than one die being rolled
