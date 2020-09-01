@@ -12,6 +12,7 @@
 #  - Got basic functionality working and set up for expansion.
 
 require_relative '../data/namegen/pitcockData'
+require_relative '../data/namegen/dataStore'
 require_relative '../data/extraFunctions'
 
 module SurfBot; module Plugins
@@ -33,10 +34,8 @@ module Namegen
 
 	def self.get_markov_index(character)
 		return (character.match?(/[A-Za-z]/)? character.upcase.ord%("A".ord)  : 0 )
-	end
+	en
 
-	def self.markov_namegen(num_names)
-		output = "Try these out: "
 		num_names.times do |index|
 			state_a = 0
 			state_b = 0
@@ -55,6 +54,24 @@ module Namegen
 			end
 			output << "#{name}#{((index < num_names-1) ? ', ' : '.' )}"
 		end
+		output
+	end
+
+	def self.phone_pad_gen_name
+		name_length = rand(4..10)
+		numbers = rand(0..9_999_999_999).to_s.rjust(10,"0")
+		name = ""
+		name_length.times do |num|
+			name = @@phone_pad_data[numbers[-num]].sample + name
+		end
+		name.capitalize
+	end
+
+	def self.phone_pad_namegen(num_names)
+		output = "Try one of these on: "
+		num_names.times do |index|
+			output << "#{phone_pad_gen_name}#{index < num_names-1 ? ", " : "." }"
+		end	
 		output
 	end
 
@@ -88,8 +105,6 @@ module Namegen
 		output
 	end
 
-	@@alphabet = [*('a'..'z')]
-
 	def self.sea_gen_suggestion
 		"Try using these: #{@@alphabet.sample}, #{@@alphabet.sample}, #{@@alphabet.sample}, #{@@alphabet.sample}."
 	end
@@ -113,13 +128,15 @@ module Namegen
 	end
 
 	command(:namegen,
-		description: "Generates names through a variety of methods; default is IRC (Pitcock).\nOptions: markov, irc, shitty, sea"
+		description: "Generates names through a variety of methods; default is IRC (Pitcock).\nOptions: markov, irc, shitty, sea, sea2, phone"
 		) do |event, *args|
 		input = args[0..2]
 		num_names = (args.select { |e| e.match? /\d+/ })[0].to_i
 		num_names = ((num_names == 0 || num_names > 20) ? @@DEFAULT_NUM_NAMES : num_names)
 		if (input.any? { |e| e.match? /markov/i })
 			output = markov_namegen(num_names)
+		elsif (input.any? { |e| e.match? /phone/i })
+			output = phone_pad_namegen(num_names)
 		elsif (input.any? { |e| e.match? /irc/i })
 			output = pitcock_namegen(num_names, false)
 		elsif (input.any? { |e| e.match? /shitty/i })
