@@ -1,9 +1,11 @@
 # namegen.rb
 # Author: natleyn
-# Version: 1.0.1
+# Version: 1.0.3
 # Generates names through a variety of methods, the default being Markov.
 #
 # Changelog
+# 1.0.3
+#  - Added phone name generation, based off the letters assigned to numbers on phone number pad text entry systems.
 # 1.0.2
 #  - Added a method (sea2_gen_name / sea2_gen_suggestion) of generating names from pure random selection of consonants and vowels. May need tweaking.
 # 1.0.1
@@ -34,8 +36,6 @@ module Namegen
 
 	def self.get_markov_index(character)
 		return (character.match?(/[A-Za-z]/)? character.upcase.ord%("A".ord)  : 0 )
-	en
-
 		num_names.times do |index|
 			state_a = 0
 			state_b = 0
@@ -55,6 +55,10 @@ module Namegen
 			output << "#{name}#{((index < num_names-1) ? ', ' : '.' )}"
 		end
 		output
+	end
+
+	def self.markov_namegen(num_names)
+		return "WIP"
 	end
 
 	def self.phone_pad_gen_name
