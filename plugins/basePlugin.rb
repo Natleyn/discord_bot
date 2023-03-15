@@ -5,7 +5,7 @@
 
 # require treats directories as they are relative to the current working directory of surfBot.rb, not of the plugin file
 # require_relative does the opposite: the directory of the plugin file is considered the CWD for the provided argument
-require_relative '../surfBotInfo2.rb'
+require_relative '../surfInfo.rb'
 
 module SurfBot; module Plugins
 module BasePlugin

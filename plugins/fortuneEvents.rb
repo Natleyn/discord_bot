@@ -4,7 +4,7 @@
 # The event plugin for handling fortune/random messages that don't come through commands. 
 
 require_relative '../data/fortune'
-require_relative '../surfBotInfo2'
+require_relative '../surfInfo'
 
 module SurfBot; module Plugins
 module Fortune

@@ -56,6 +56,10 @@ module Roleplay
 		break if !args[0].nil?
 		event << "[happy doggo noises]"
 	end
+	command(:brush, help_available: false) do |event, *args|
+		break if !args[0].nil?
+		event << "[happy doggo noises]"
+	end
 	command(:brushie, help_available: false) do |event, *args|
 		break if !args[0].nil?
 		event << "[happy doggo noises]"

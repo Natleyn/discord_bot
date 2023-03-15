@@ -5,7 +5,7 @@
 # 1.0.1
 #  - Changed the final substitution for gathering input (gsub(/\?/) -> sub(/\?+\z/)
 
-require_relative '../surfBotInfo2'
+require_relative '../surfInfo'
 
 module SurfBot; module Plugins
 module Fortune

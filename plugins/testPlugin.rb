@@ -3,7 +3,7 @@
 # Version: n/a
 # Testbed for various commands and whatnot. Nothing in here is permanent.
 
-require_relative '../surfBotInfo2.rb'
+require_relative '../surfInfo'
 
 module SurfBot; module Plugins
 module Test

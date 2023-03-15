@@ -6,7 +6,7 @@
 #  - Moved functionality from the command handler to a separate function to facilitate testing and reloadability.
 #  - Refactored existing code to conform to current style patterns.
 
-require_relative '../surfBotInfo2'
+require_relative '../surfInfo'
 require_relative '../data/domtCards'
 
 module SurfBot; module Plugins

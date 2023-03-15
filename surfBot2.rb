@@ -17,7 +17,7 @@ module SurfBot
 
 	version = "2.0.1"
 
-	require_relative './surfBotInfo2'
+	require_relative './surfInfo'
 
 	# initialize the bot
 	@bot = Discordrb::Commands::CommandBot.new( token: @surf_client_token, client_id: @surf_client_token, prefix: @surf_cmd_prefix )
@@ -90,8 +90,10 @@ module SurfBot
 				include!(@plugin_list[plugin_filename])
 			when /save/i
 				# TODO: save all plugin data
+				@plugin_list[plugin_filename].save_data if @plugin_list.include?(plugin_filename)
 			when /stop/i
 				print "Stopping plugin #{plugin_filename}... "
+				@plugin_list[plugin_filename].save_data
 				@plugin_list[plugin_filename].stop
 			when /list/i
 				list = "Plugins:```\n"

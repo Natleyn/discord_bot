@@ -21,7 +21,7 @@
 # 1.0.1
 #  - Fixed an error in default die application ([-+] was not what I thought it was and didn't include x; moved to [x\-+])
 
-require_relative '../surfBotInfo2'
+require_relative '../surfInfo'
 require_relative '../data/wmsInfo'
 require_relative '../data/wms2Info'
 require_relative '../data/extraFunctions.rb'

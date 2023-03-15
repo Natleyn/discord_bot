@@ -4,7 +4,7 @@
 # Simple tool to allow me to get my server's public IP remotely using ipify.org's service API.
 
 require 'net/http'
-require_relative '../surfBotInfo2'
+require_relative '../surfInfo'
 
 module SurfBot; module Plugins
 module GetIP

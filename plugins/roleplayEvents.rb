@@ -3,7 +3,7 @@
 # Version: 1.0.0
 # The event plugin for handling roleplay interactions with chat.
 
-require_relative '../surfBotInfo2'
+require_relative '../surfInfo'
 
 module SurfBot; module Plugins
 module Roleplay
