@@ -55,9 +55,7 @@ module Roll; module WMS
 
 	def self.roll_WMS
 		roll = rand(1..100)
-		target = 2
-		while(roll > target) ; target += 2; end
-		return "Rolled an #{roll}: #{@@WMS_effects[target]}"
+		return "Rolled an #{roll}: #{@@WMS_effects[(roll.odd?)? roll+1 : roll]}"
 	end	
 end; end # WMS; Roll
 end; end # Plugins; SurfBot
