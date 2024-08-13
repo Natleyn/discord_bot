@@ -158,7 +158,7 @@ module Namegen
 	end
 
 	command(:namegen,
-		description: "Generates names through a variety of methods; default is IRC (Pitcock). Min 1, Max 20, default of 10.\nOptions: markov, irc, phone, planegea, pomni, sea, sea2, shitty,"
+		description: "Generates names through a variety of methods; default is IRC (Pitcock). Min 1, Max 20, default of 10.\nOptions: markov, irc, phone, planegea, pomni, sea, sea2, shitty"
 		) do |event, *args|
 		input = args[0..5]
 		num_names = (args.select { |e| e.match? /\d+/ })[0].to_i
