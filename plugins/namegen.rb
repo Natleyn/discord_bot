@@ -4,6 +4,8 @@
 # Generates names through a variety of methods, the default being Markov.
 #
 # Changelog
+# 1.0.4
+#  - Added message when providing invalid generation options. Refined help information.
 # 1.0.3
 #  - Added phone name generation, based off the letters assigned to numbers on phone number pad text entry systems.
 # 1.0.2
@@ -24,6 +26,7 @@ module Namegen
 	def self.filename; "namegen.rb"; end
 
 	@@DEFAULT_NUM_NAMES = 10
+	@@PLUGIN_OPTIONS = "markov, irc, phone, planegea, pomni, sea, sea2, shitty"
 
 	# TODO: Initialize the starting letters in every hash somehow, or get an rwe setup to return a specific letter without it having an entry in @@markov_data
 	weighted_letter_hash_maker = lambda do 
@@ -158,7 +161,7 @@ module Namegen
 	end
 
 	command(:namegen,
-		description: "Generates names through a variety of methods; default is IRC (Pitcock). Min 1, Max 20, default of 10.\nOptions: markov, irc, phone, planegea, pomni, sea, sea2, shitty"
+		description: "Generates names through a variety of methods; default is IRC (Pitcock). Min 1, Max 20, default of 10.\nUsage: `;namegen {style} {number of names}`\nOptions: #{@@PLUGIN_OPTIONS}"
 		) do |event, *args|
 		input = args[0..5]
 		num_names = (args.select { |e| e.match? /\d+/ })[0].to_i
@@ -189,7 +192,11 @@ module Namegen
 		elsif (input.any? { |e| e.match? /^pomni$/i } )
 			output = pomni_gen_suggestion
 		else
-			output = pitcock_namegen(num_names, false)
+			if(!input.nil? && !input.empty?) 
+				output = "Unknown option: \"#{input[0]}\". Options: #{@@PLUGIN_OPTIONS}"
+			else
+				output = pitcock_namegen(num_names, false)
+			end
 		end
 		event << output
 	end
