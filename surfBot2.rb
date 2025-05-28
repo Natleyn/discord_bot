@@ -178,7 +178,7 @@ module SurfBot
 			end
 			user_name = event.user.username
 			the_message = event.message.to_s
-			puts "<#{server_name}.#{channel_name}> #{user_name}: #{the_message}"
+			puts "[#{event.timestamp}]<#{server_name}.#{channel_name}> #{user_name}: #{the_message}"
 		end
 	end if @log_messages_to_console
 
